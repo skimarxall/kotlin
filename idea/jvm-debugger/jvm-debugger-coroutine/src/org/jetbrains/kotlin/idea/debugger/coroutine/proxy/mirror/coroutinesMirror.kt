@@ -32,31 +32,34 @@ abstract class BaseMirror<T>(val name: String, context: DefaultExecutionContext)
             return fetchMirror(value, context)
     }
 
-    fun staticObjectValue(fieldName: String): ObjectReference {
+    fun staticObjectValue(fieldName: String): ObjectReference? {
         val keyFieldRef = makeField(fieldName)
-        return cls.getValue(keyFieldRef) as ObjectReference
+        return cls.getValue(keyFieldRef) as? ObjectReference
     }
 
     fun stringValue(value: ObjectReference, field: Field) =
-        (value.getValue(field) as StringReference).value()
+        (value.getValue(field) as? StringReference)?.value()
+
+    fun byteValue(value: ObjectReference, field: Field) =
+        (value.getValue(field) as? ByteValue)?.value()
 
     fun stringValue(value: ObjectReference, method: Method, context: DefaultExecutionContext) =
-        (context.invokeMethod(value, method, emptyList()) as StringReference).value()
+        (context.invokeMethod(value, method, emptyList()) as? StringReference)?.value()
 
     fun objectValue(value: ObjectReference, method: Method, context: DefaultExecutionContext, vararg values: Value) =
         context.invokeMethodAsObject(value, method, *values)
 
     fun longValue(value: ObjectReference, method: Method, context: DefaultExecutionContext, vararg values: Value) =
-        (context.invokeMethodAsObject(value, method, *values) as LongValue).longValue()
+        (context.invokeMethodAsObject(value, method, *values) as? LongValue)?.longValue()
 
     fun objectValue(value: ObjectReference, field: Field) =
-        value.getValue(field) as ObjectReference
+        value.getValue(field) as ObjectReference?
 
     fun intValue(value: ObjectReference, field: Field) =
-        (value.getValue(field) as IntegerValue).intValue()
+        (value.getValue(field) as? IntegerValue)?.intValue()
 
     fun longValue(value: ObjectReference, field: Field) =
-        (value.getValue(field) as LongValue).longValue()
+        (value.getValue(field) as? LongValue)?.longValue()
 
     protected abstract fun fetchMirror(value: ObjectReference, context: DefaultExecutionContext): T?
 }

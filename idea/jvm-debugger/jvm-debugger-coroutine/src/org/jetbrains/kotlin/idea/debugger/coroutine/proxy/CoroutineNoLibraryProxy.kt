@@ -54,7 +54,8 @@ class CoroutineNoLibraryProxy(val executionContext: DefaultExecutionContext) : C
         val continuation = mirror.delegate?.continuation ?: return null
         val ch = ContinuationHolder(continuation, executionContext)
         val coroutineWithRestoredStack = ch.getAsyncStackTraceIfAny() ?: return null
-        return CoroutineInfoData.suspendedCoroutineInfoData(coroutineWithRestoredStack, continuation)
+        val coroutineInfoData = CoroutineInfoData.suspendedCoroutineInfoData(coroutineWithRestoredStack, continuation)
+        return coroutineInfoData
     }
 
     private fun dispatchedContinuation(resultList: MutableList<CoroutineInfoData>): Boolean {
@@ -76,7 +77,8 @@ class CoroutineNoLibraryProxy(val executionContext: DefaultExecutionContext) : C
         val initialContinuation = dispatchedContinuation.getValue(continuation) as ObjectReference
         val ch = ContinuationHolder(initialContinuation, executionContext)
         val coroutineWithRestoredStack = ch.getAsyncStackTraceIfAny() ?: return null
-        return CoroutineInfoData.suspendedCoroutineInfoData(coroutineWithRestoredStack, initialContinuation)
+        val suspendedCoroutineInfoData = CoroutineInfoData.suspendedCoroutineInfoData(coroutineWithRestoredStack, initialContinuation)
+        return suspendedCoroutineInfoData
     }
 
 }
