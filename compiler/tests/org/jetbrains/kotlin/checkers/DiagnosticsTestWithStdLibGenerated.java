@@ -1907,6 +1907,11 @@ public class DiagnosticsTestWithStdLibGenerated extends AbstractDiagnosticsTestW
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/chainCallWithExtensionExplicitTypes.kt");
             }
 
+            @TestMetadata("classLiteralToClassWithParameters.kt")
+            public void testClassLiteralToClassWithParameters() throws Exception {
+                runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/classLiteralToClassWithParameters.kt");
+            }
+
             @TestMetadata("coroutineInferenceWithCapturedTypeVariable.kt")
             public void testCoroutineInferenceWithCapturedTypeVariable() throws Exception {
                 runTest("compiler/testData/diagnostics/testsWithStdLib/coroutines/inference/coroutineInferenceWithCapturedTypeVariable.kt");
