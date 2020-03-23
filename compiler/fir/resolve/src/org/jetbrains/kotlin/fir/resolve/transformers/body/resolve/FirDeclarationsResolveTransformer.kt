@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyAccessor
 import org.jetbrains.kotlin.fir.declarations.synthetic.FirSyntheticProperty
 import org.jetbrains.kotlin.fir.diagnostics.DiagnosticKind
-import org.jetbrains.kotlin.fir.diagnostics.FirSimpleDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.buildReturnExpression
 import org.jetbrains.kotlin.fir.expressions.builder.buildUnitExpression
@@ -427,7 +427,7 @@ class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransformer) 
             } else {
                 result.transformReturnTypeRef(
                     transformer,
-                    withExpectedType(buildErrorTypeRef { diagnostic = FirSimpleDiagnostic("empty body", DiagnosticKind.Other) })
+                    withExpectedType(buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("empty body", DiagnosticKind.Other) })
                 )
             }
         }
@@ -645,7 +645,7 @@ class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransformer) 
                 initializer != null -> {
                     val expectedType = when (val resultType = initializer.resultType) {
                         is FirImplicitTypeRef -> buildErrorTypeRef {
-                            diagnostic = FirSimpleDiagnostic("No result type for initializer", DiagnosticKind.InferenceError)
+                            diagnostic = ConeSimpleDiagnostic("No result type for initializer", DiagnosticKind.InferenceError)
                         }
                         else -> resultType
                     }
@@ -657,7 +657,7 @@ class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransformer) 
                 variable.getter != null && variable.getter !is FirDefaultPropertyAccessor -> {
                     val expectedType = when (val resultType = variable.getter?.returnTypeRef) {
                         is FirImplicitTypeRef -> buildErrorTypeRef {
-                            diagnostic = FirSimpleDiagnostic("No result type for getter", DiagnosticKind.InferenceError)
+                            diagnostic = ConeSimpleDiagnostic("No result type for getter", DiagnosticKind.InferenceError)
                         }
                         else -> resultType
                     }
@@ -671,7 +671,7 @@ class FirDeclarationsResolveTransformer(transformer: FirBodyResolveTransformer) 
                         transformer,
                         withExpectedType(
                             buildErrorTypeRef {
-                                diagnostic = FirSimpleDiagnostic(
+                                diagnostic = ConeSimpleDiagnostic(
                                     "Cannot infer variable type without initializer / getter / delegate",
                                     DiagnosticKind.InferenceError,
                                 )

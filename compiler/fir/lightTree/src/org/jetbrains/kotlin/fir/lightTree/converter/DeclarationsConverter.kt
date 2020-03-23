@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.diagnostics.DiagnosticKind
-import org.jetbrains.kotlin.fir.diagnostics.FirSimpleDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirSingleExpressionBlock
@@ -715,7 +715,7 @@ class DeclarationsConverter(
         val delegatedSelfTypeRef =
             if (classWrapper.isObjectLiteral()) buildErrorTypeRef {
                 source = secondaryConstructor.toFirSourceElement()
-                diagnostic = FirSimpleDiagnostic(
+                diagnostic = ConeSimpleDiagnostic(
                     "Constructor in object",
                     DiagnosticKind.ConstructorInObject
                 )
@@ -773,10 +773,10 @@ class DeclarationsConverter(
         val delegatedType =
             if (classWrapper.isObjectLiteral() || classWrapper.isInterface()) when {
                 isThis -> buildErrorTypeRef {
-                    diagnostic = FirSimpleDiagnostic("Constructor in object", DiagnosticKind.ConstructorInObject)
+                    diagnostic = ConeSimpleDiagnostic("Constructor in object", DiagnosticKind.ConstructorInObject)
                 }
                 else -> buildErrorTypeRef {
-                    diagnostic = FirSimpleDiagnostic("No super type", DiagnosticKind.Syntax)
+                    diagnostic = ConeSimpleDiagnostic("No super type", DiagnosticKind.Syntax)
                 }
             }
             else when {
@@ -944,7 +944,7 @@ class DeclarationsConverter(
         var isVar = false
         val entries = mutableListOf<FirVariable<*>>()
         var firExpression: FirExpression =
-            buildErrorExpression(null, FirSimpleDiagnostic("Destructuring declaration without initializer", DiagnosticKind.Syntax))
+            buildErrorExpression(null, ConeSimpleDiagnostic("Destructuring declaration without initializer", DiagnosticKind.Syntax))
         destructingDeclaration.forEachChildren {
             when (it.tokenType) {
                 VAR_KEYWORD -> isVar = true
@@ -1250,7 +1250,7 @@ class DeclarationsConverter(
     private fun convertExplicitDelegation(explicitDelegation: LighterASTNode): FirDelegatedTypeRef {
         lateinit var firTypeRef: FirTypeRef
         var firExpression: FirExpression? = buildErrorExpression(
-            explicitDelegation.toFirSourceElement(), FirSimpleDiagnostic("Should have delegate", DiagnosticKind.Syntax)
+            explicitDelegation.toFirSourceElement(), ConeSimpleDiagnostic("Should have delegate", DiagnosticKind.Syntax)
         )
         explicitDelegation.forEachChildren {
             when (it.tokenType) {
@@ -1346,10 +1346,10 @@ class DeclarationsConverter(
      */
     fun convertType(type: LighterASTNode): FirTypeRef {
         if (type.asText.isEmpty()) {
-            return buildErrorTypeRef { diagnostic = FirSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax) }
+            return buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax) }
         }
         var typeModifiers = TypeModifier() //TODO what with suspend?
-        var firType: FirTypeRef = buildErrorTypeRef { diagnostic = FirSimpleDiagnostic("Incomplete code", DiagnosticKind.Syntax) }
+        var firType: FirTypeRef = buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Incomplete code", DiagnosticKind.Syntax) }
         var afterLPar = false
         type.forEachChildren {
             when (it.tokenType) {
@@ -1364,7 +1364,7 @@ class DeclarationsConverter(
                     isMarkedNullable = false
                 }
                 TokenType.ERROR_ELEMENT -> firType =
-                    buildErrorTypeRef { diagnostic = FirSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax) }
+                    buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax) }
             }
         }
 
@@ -1422,7 +1422,7 @@ class DeclarationsConverter(
         }
 
         if (identifier == null)
-            return buildErrorTypeRef { diagnostic = FirSimpleDiagnostic("Incomplete user type", DiagnosticKind.Syntax) }
+            return buildErrorTypeRef { diagnostic = ConeSimpleDiagnostic("Incomplete user type", DiagnosticKind.Syntax) }
 
         val qualifierPart = FirQualifierPartImpl(identifier.nameAsSafeName()).apply { typeArguments += firTypeArguments }
 

@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.diagnostics.DiagnosticKind
-import org.jetbrains.kotlin.fir.diagnostics.FirSimpleDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirModifiableQualifiedAccess
@@ -124,7 +124,7 @@ class RawFirBuilder(
         private fun KtTypeReference?.toFirOrErrorType(): FirTypeRef =
             convertSafe() ?: buildErrorTypeRef {
                 source = this@toFirOrErrorType?.toFirSourceElement()
-                diagnostic = FirSimpleDiagnostic(
+                diagnostic = ConeSimpleDiagnostic(
                     if (this@toFirOrErrorType == null) "Incomplete code" else "Conversion failed", DiagnosticKind.Syntax
                 )
             }
@@ -134,18 +134,18 @@ class RawFirBuilder(
             if (stubMode) buildExpressionStub()
             else with(this()) {
                 convertSafe() ?: buildErrorExpression(
-                    this?.toFirSourceElement(), FirSimpleDiagnostic(errorReason, DiagnosticKind.Syntax),
+                    this?.toFirSourceElement(), ConeSimpleDiagnostic(errorReason, DiagnosticKind.Syntax),
                 )
             }
 
         private fun KtExpression?.toFirExpression(errorReason: String): FirExpression =
             if (stubMode) buildExpressionStub()
             else convertSafe() ?: buildErrorExpression(
-                this?.toFirSourceElement(), FirSimpleDiagnostic(errorReason, DiagnosticKind.Syntax),
+                this?.toFirSourceElement(), ConeSimpleDiagnostic(errorReason, DiagnosticKind.Syntax),
             )
 
         private fun KtExpression.toFirStatement(errorReason: String): FirStatement =
-            convertSafe() ?: buildErrorExpression(this.toFirSourceElement(), FirSimpleDiagnostic(errorReason, DiagnosticKind.Syntax))
+            convertSafe() ?: buildErrorExpression(this.toFirSourceElement(), ConeSimpleDiagnostic(errorReason, DiagnosticKind.Syntax))
 
         private fun KtExpression.toFirStatement(): FirStatement =
             convert()
@@ -159,7 +159,7 @@ class RawFirBuilder(
                         delegatedSuperType,
                         delegatedSelfType ?: buildErrorTypeRef {
                             source = this@toFirDeclaration.toFirSourceElement()
-                            diagnostic = FirSimpleDiagnostic("Constructor in object", DiagnosticKind.ConstructorInObject)
+                            diagnostic = ConeSimpleDiagnostic("Constructor in object", DiagnosticKind.ConstructorInObject)
                         },
                         owner,
                         hasPrimaryConstructor,
@@ -207,7 +207,7 @@ class RawFirBuilder(
             if (this == null) {
                 return buildErrorExpression(
                     (this as? KtElement)?.toFirSourceElement(),
-                    FirSimpleDiagnostic("No argument given", DiagnosticKind.Syntax),
+                    ConeSimpleDiagnostic("No argument given", DiagnosticKind.Syntax),
                 )
             }
             val name = this.getArgumentName()?.asName
@@ -837,7 +837,7 @@ class RawFirBuilder(
                 }
                 val ktBody = literal.bodyExpression
                 body = if (ktBody == null) {
-                    val errorExpression = buildErrorExpression(source, FirSimpleDiagnostic("Lambda has no body", DiagnosticKind.Syntax))
+                    val errorExpression = buildErrorExpression(source, ConeSimpleDiagnostic("Lambda has no body", DiagnosticKind.Syntax))
                     FirSingleExpressionBlock(errorExpression.toReturn())
                 } else {
                     configureBlockWithoutBuilding(ktBody).apply {
@@ -900,7 +900,7 @@ class RawFirBuilder(
                 isThis -> delegatedSelfTypeRef
                 else -> delegatedSuperTypeRef ?: buildErrorTypeRef {
                     this.source = source
-                    diagnostic = FirSimpleDiagnostic("No super type", DiagnosticKind.Syntax)
+                    diagnostic = ConeSimpleDiagnostic("No super type", DiagnosticKind.Syntax)
                 }
             }
             return buildDelegatedConstructorCall {
@@ -1025,7 +1025,7 @@ class RawFirBuilder(
                     } else {
                         FirErrorTypeRefBuilder().apply {
                             this.source = source
-                            diagnostic = FirSimpleDiagnostic("Incomplete user type", DiagnosticKind.Syntax)
+                            diagnostic = ConeSimpleDiagnostic("Incomplete user type", DiagnosticKind.Syntax)
                         }
                     }
                 }
@@ -1046,7 +1046,7 @@ class RawFirBuilder(
                 }
                 null -> FirErrorTypeRefBuilder().apply {
                     this.source = source
-                    diagnostic = FirSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax)
+                    diagnostic = ConeSimpleDiagnostic("Unwrapped type is null", DiagnosticKind.Syntax)
                 }
                 else -> throw AssertionError("Unexpected type element: ${unwrappedElement.text}")
             }
@@ -1478,7 +1478,7 @@ class RawFirBuilder(
                 is KtParenthesizedExpression -> splitToCalleeAndReceiver(calleeExpression.expression, defaultSource)
 
                 null -> {
-                    buildErrorNamedReference { diagnostic = FirSimpleDiagnostic("Call has no callee", DiagnosticKind.Syntax) } to null
+                    buildErrorNamedReference { diagnostic = ConeSimpleDiagnostic("Call has no callee", DiagnosticKind.Syntax) } to null
                 }
 
                 else -> {
@@ -1550,7 +1550,7 @@ class RawFirBuilder(
         override fun visitQualifiedExpression(expression: KtQualifiedExpression, data: Unit): FirElement {
             val selector = expression.selectorExpression
                 ?: return buildErrorExpression(
-                    expression.toFirSourceElement(), FirSimpleDiagnostic("Qualified expression without selector", DiagnosticKind.Syntax),
+                    expression.toFirSourceElement(), ConeSimpleDiagnostic("Qualified expression without selector", DiagnosticKind.Syntax),
                 )
             val firSelector = selector.toFirExpression("Incorrect selector expression")
             if (firSelector is FirModifiableQualifiedAccess) {
@@ -1585,7 +1585,7 @@ class RawFirBuilder(
 
         override fun visitParenthesizedExpression(expression: KtParenthesizedExpression, data: Unit): FirElement {
             return expression.expression?.accept(this, data)
-                ?: buildErrorExpression(expression.toFirSourceElement(), FirSimpleDiagnostic("Empty parentheses", DiagnosticKind.Syntax))
+                ?: buildErrorExpression(expression.toFirSourceElement(), ConeSimpleDiagnostic("Empty parentheses", DiagnosticKind.Syntax))
         }
 
         override fun visitLabeledExpression(expression: KtLabeledExpression, data: Unit): FirElement {
@@ -1599,7 +1599,7 @@ class RawFirBuilder(
                 }
             }
             val result = expression.baseExpression?.accept(this, data)
-                ?: buildErrorExpression(sourceElement, FirSimpleDiagnostic("Empty label", DiagnosticKind.Syntax))
+                ?: buildErrorExpression(sourceElement, ConeSimpleDiagnostic("Empty label", DiagnosticKind.Syntax))
             if (size != context.firLabels.size) {
                 context.firLabels.removeLast()
                 println("Unused label: ${expression.text}")
@@ -1617,7 +1617,7 @@ class RawFirBuilder(
             val result = rawResult as? FirAnnotationContainer
                 ?: return buildErrorExpression(
                     expression.toFirSourceElement(),
-                    FirSimpleDiagnostic("Strange annotated expression: ${rawResult?.render()}", DiagnosticKind.Syntax),
+                    ConeSimpleDiagnostic("Strange annotated expression: ${rawResult?.render()}", DiagnosticKind.Syntax),
                 )
             expression.extractAnnotationsTo(result.annotations as MutableList<FirAnnotationCall>)
             return result

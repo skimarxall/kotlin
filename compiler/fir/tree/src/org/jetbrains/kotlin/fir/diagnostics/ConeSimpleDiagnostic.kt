@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.fir.diagnostics
 
-class FirSimpleDiagnostic(override val reason: String, val kind: DiagnosticKind = DiagnosticKind.Other) : FirDiagnostic()
+class ConeSimpleDiagnostic(override val reason: String, val kind: DiagnosticKind = DiagnosticKind.Other) : ConeDiagnostic()
 
 enum class DiagnosticKind {
     Syntax,

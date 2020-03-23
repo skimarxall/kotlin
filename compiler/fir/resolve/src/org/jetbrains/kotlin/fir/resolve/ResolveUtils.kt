@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.*
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.diagnostics.FirStubDiagnostic
+import org.jetbrains.kotlin.fir.diagnostics.ConeStubDiagnostic
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccess
 import org.jetbrains.kotlin.fir.expressions.FirQualifiedAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirResolvable
@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.fir.references.FirSuperReference
 import org.jetbrains.kotlin.fir.references.FirThisReference
 import org.jetbrains.kotlin.fir.resolve.calls.FirNamedReferenceWithCandidate
 import org.jetbrains.kotlin.fir.resolve.calls.isSuperReferenceExpression
-import org.jetbrains.kotlin.fir.resolve.diagnostics.FirUnresolvedNameError
+import org.jetbrains.kotlin.fir.resolve.diagnostics.ConeUnresolvedNameError
 import org.jetbrains.kotlin.fir.resolve.substitution.AbstractConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.resultType
 import org.jetbrains.kotlin.fir.scopes.impl.FirDeclaredMemberScopeProvider
@@ -300,7 +300,7 @@ fun <T : FirResolvable> BodyResolveComponents.typeFromCallee(access: T): FirReso
         is FirErrorNamedReference ->
             buildErrorTypeRef {
                 source = access.source
-                diagnostic = FirStubDiagnostic(newCallee.diagnostic)
+                diagnostic = ConeStubDiagnostic(newCallee.diagnostic)
             }
         is FirNamedReferenceWithCandidate -> {
             typeFromSymbol(newCallee.candidateSymbol, makeNullable)
@@ -319,7 +319,7 @@ fun <T : FirResolvable> BodyResolveComponents.typeFromCallee(access: T): FirReso
         is FirSuperReference -> {
             newCallee.superTypeRef as? FirResolvedTypeRef ?: buildErrorTypeRef {
                 source = newCallee.source
-                diagnostic = FirUnresolvedNameError(Name.identifier("super"))
+                diagnostic = ConeUnresolvedNameError(Name.identifier("super"))
             }
         }
         else -> error("Failed to extract type from: $newCallee")
