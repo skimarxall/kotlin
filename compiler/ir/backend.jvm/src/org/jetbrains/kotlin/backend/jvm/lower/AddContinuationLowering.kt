@@ -118,7 +118,7 @@ private class AddContinuationLowering(private val context: JvmBackendContext) : 
                     irBlock {
                         +generateContinuationClassForLambda(
                             info,
-                            currentDeclarationParent,
+                            currentDeclarationParent!!,
                             (currentFunction?.irElement as? IrFunction)?.isInline == true
                         )
                         val constructor = info.constructor
