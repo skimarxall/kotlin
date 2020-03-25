@@ -3280,6 +3280,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
             runTest("compiler/testData/codegen/boxInline/smap/oneFile.kt");
         }
 
+        @TestMetadata("rangeFolding.kt")
+        public void testRangeFolding() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/smap/rangeFolding.kt");
+        }
+
         @TestMetadata("smap.kt")
         public void testSmap() throws Exception {
             runTest("compiler/testData/codegen/boxInline/smap/smap.kt");
