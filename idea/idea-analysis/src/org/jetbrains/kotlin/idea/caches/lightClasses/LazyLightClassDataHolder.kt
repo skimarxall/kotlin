@@ -130,31 +130,40 @@ sealed class LazyLightClassDataHolder(
 
             val dummyDelegate = dummyDelegate ?: return KtLightMethodImpl.fromClsMethods(clsDelegate, containingClass)
 
-            return filteredNonSyntheticMethods(dummyDelegate).map { dummyMethod ->
-                val methodOrigin = KtLightMethodImpl.getOrigin(dummyMethod)
+            fun PsiMethod.convertToLightMethod(): PsiMethod {
+                val dummyIndex = memberIndex!!
 
-                KtLightMethodImpl.lazy(dummyMethod, containingClass, methodOrigin) {
-                    val dummyIndex = dummyMethod.memberIndex!!
+                val byMemberIndex: (PsiMethod) -> Boolean = { it.memberIndex == dummyIndex }
 
-                    val byMemberIndex: (PsiMethod) -> Boolean = { it.memberIndex == dummyIndex }
+                /* Searching all methods may be necessary in some cases where we failed to rollback optimization:
+                   Overriding internal member that was final
 
-                    /* Searching all methods may be necessary in some cases where we failed to rollback optimization:
-                       Overriding internal member that was final
+                   Resulting light member is not consistent in this case, so this should happen only for erroneous code
+                */
+                val findMethodsByName = clsDelegate.findMethodsByName(name, false)
 
-                       Resulting light member is not consistent in this case, so this should happen only for erroneous code
-                    */
-                    val findMethodsByName = clsDelegate.findMethodsByName(dummyMethod.name, false)
+                val candidateDelegateMethod = findMethodsByName.firstOrNull(byMemberIndex)
+                    ?: clsDelegate.methods.firstOrNull(byMemberIndex)
 
-                    val candidateDelegateMethod = findMethodsByName.firstOrNull(byMemberIndex)
-                        ?: clsDelegate.methods.firstOrNull(byMemberIndex)
+                val resultMethod = candidateDelegateMethod.checkMatches(this, containingClass)
+                // fallback if unable to find method for a dummy method (e.g. synthetic methods marked explicit or implicit) are
+                // not visible as own methods.
+                //
+                // it costs some performance and has to happen in rare and odd cases
+                return resultMethod ?: KtLightMethodImpl.create(
+                    delegate = this,
+                    origin = KtLightMethodImpl.getOrigin(this),
+                    containingClass = containingClass
+                )
+            }
 
-                    candidateDelegateMethod.checkMatches(dummyMethod, containingClass) ?:
-                    // fallback if unable to find method for a dummy method (e.g. synthetic methods marked explicit or implicit) are
-                    // not visible as own methods.
-                    //
-                    // it costs some performance and has to happen in rare and odd cases
-                    KtLightMethodImpl.create(dummyMethod, KtLightMethodImpl.getOrigin(dummyMethod), containingClass)
-                }
+            return filteredNonSyntheticMethods(dummyDelegate).map {
+                KtLightMethodImpl.lazy(
+                    dummyDelegate = it,
+                    containingClass = containingClass,
+                    origin = KtLightMethodImpl.getOrigin(it),
+                    computeRealDelegate = { it.convertToLightMethod() }
+                )
             }
         }
     }
