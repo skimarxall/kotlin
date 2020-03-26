@@ -10,6 +10,7 @@ import com.intellij.psi.SyntheticElement
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 fun isSyntheticValuesOrValueOfMethod(isEnum: Boolean, method: PsiMethod): Boolean {
+    return false
     if (!isEnum) return false
     if (method !is SyntheticElement) return false
     return DescriptorUtils.ENUM_VALUE_OF.asString() == method.name || DescriptorUtils.ENUM_VALUES.asString() == method.name
