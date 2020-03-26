@@ -1,15 +1,15 @@
-// !WITH_NEW_INFERENCE
+// !LANGUAGE: +NewInference
+// !DIAGNOSTICS: -UNUSED_PARAMETER -UNUSED_VARIABLE
 
-fun test(mc: MutableCollection<out CharSequence>) {
-    mc.addAll(<!NI;TYPE_MISMATCH, OI;TYPE_MISMATCH_DUE_TO_TYPE_PROJECTIONS!>mc<!>)
+fun <K> select(vararg x: K) = x[0]
+interface A
+class B: A
+class C: A
+fun <T> id1(x: T): T = x
+fun <R> id2(x: R): R = x
 
-    mc.addAll(<!NI;TYPE_MISMATCH, OI;TYPE_MISMATCH_DUE_TO_TYPE_PROJECTIONS!>arrayListOf<CharSequence>()<!>)
-    mc.addAll(arrayListOf())
+class Out<out R>(x: R)
 
-    mc.addAll(<!NI;TYPE_MISMATCH, OI;TYPE_MISMATCH_DUE_TO_TYPE_PROJECTIONS!>listOf("")<!>)
-    mc.addAll(<!NI;TYPE_MISMATCH, OI;TYPE_MISMATCH_DUE_TO_TYPE_PROJECTIONS!>listOf<String>("")<!>)
-    mc.addAll(<!NI;TYPE_MISMATCH, OI;TYPE_MISMATCH_DUE_TO_TYPE_PROJECTIONS!>listOf<CharSequence>("")<!>)
-
-    mc.addAll(emptyList())
-    mc.addAll(emptyList<Nothing>())
+fun main() {
+    val x1 = select(id1 { B() }, id2 { <!TYPE_MISMATCH, TYPE_MISMATCH!>C()<!> })
 }
