@@ -56,12 +56,8 @@ class KotlinConfigurationCheckerComponent(val project: Project) : ProjectCompone
 
     fun performProjectPostOpenActions() {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val modulesWithKotlinFiles = project.runReadActionInSmartMode {
-                getModulesWithKotlinFiles(project)
-            }
-            for (module in modulesWithKotlinFiles) {
-                runReadAction {
-                    if (project.isDisposed) return@runReadAction
+            project.runReadActionInSmartMode {
+                for (module in getModulesWithKotlinFiles(project)) {
                     module.getAndCacheLanguageLevelByDependencies()
                 }
             }
