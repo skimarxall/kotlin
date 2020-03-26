@@ -1739,7 +1739,9 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 : returnType;
 
         KotlinType kotlinTypeForExpression =
-                isBlockedNamedFunction || isVoidCoroutineLambda ? null : context.getFunctionDescriptor().getReturnType();
+                isBlockedNamedFunction || isVoidCoroutineLambda
+                ? null
+                : typeMapper.getReturnValueType(context.getFunctionDescriptor());
 
         gen(expr, typeForExpression, kotlinTypeForExpression);
 

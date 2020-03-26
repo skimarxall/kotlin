@@ -1386,6 +1386,11 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
             runTest("compiler/testData/codegen/bytecodeText/coroutines/doNotReassignContinuation.kt");
         }
 
+        @TestMetadata("noInlineClassBoxingInSuspendFunReturn.kt")
+        public void testNoInlineClassBoxingInSuspendFunReturn() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/coroutines/noInlineClassBoxingInSuspendFunReturn.kt");
+        }
+
         @TestMetadata("returnUnitInLambda.kt")
         public void testReturnUnitInLambda_1_2() throws Exception {
             runTestWithPackageReplacement("compiler/testData/codegen/bytecodeText/coroutines/returnUnitInLambda.kt", "kotlin.coroutines.experimental");
