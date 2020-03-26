@@ -251,6 +251,11 @@ public class IrJsCodegenInlineTestGenerated extends AbstractIrJsCodegenInlineTes
             runTest("compiler/testData/codegen/boxInline/anonymousObject/superConstructorWithObjectParameter.kt");
         }
 
+        @TestMetadata("typeInfo.kt")
+        public void testTypeInfo() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/anonymousObject/typeInfo.kt");
+        }
+
         @TestMetadata("withInlineMethod.kt")
         public void testWithInlineMethod() throws Exception {
             runTest("compiler/testData/codegen/boxInline/anonymousObject/withInlineMethod.kt");
